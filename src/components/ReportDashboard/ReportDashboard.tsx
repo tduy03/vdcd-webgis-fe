@@ -285,7 +285,7 @@ export const ReportDashboard: React.FC = () => {
           <Package className="w-4 h-4" />
           Tiêu hao NVL
         </button>
-        {/* <button
+        <button
           onClick={() => setActiveTab('quality')}
           className={`px-4 py-3 text-sm font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'quality'
@@ -295,7 +295,7 @@ export const ReportDashboard: React.FC = () => {
         >
           <CheckCircle className="w-4 h-4" />
           Chất lượng
-        </button> */}
+        </button>
         <button
           onClick={() => setActiveTab('inventory')}
           className={`px-4 py-3 text-sm font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${
@@ -307,7 +307,7 @@ export const ReportDashboard: React.FC = () => {
           <Package className="w-4 h-4" />
           Tồn kho
         </button>
-        {/* <button
+        <button
           onClick={() => setActiveTab('cost')}
           className={`px-4 py-3 text-sm font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'cost'
@@ -317,8 +317,8 @@ export const ReportDashboard: React.FC = () => {
         >
           <DollarSign className="w-4 h-4" />
           Chi phí
-        </button> */}
-        {/* <button
+        </button>
+        <button
           onClick={() => setActiveTab('oee')}
           className={`px-4 py-3 text-sm font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'oee'
@@ -328,7 +328,7 @@ export const ReportDashboard: React.FC = () => {
         >
           <Activity className="w-4 h-4" />
           OEE
-        </button> */}
+        </button>
       </div>
 
       {/* Content */}
