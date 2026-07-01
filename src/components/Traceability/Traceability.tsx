@@ -7,18 +7,13 @@ import {
   Package,
   Calendar,
   CheckCircle,
-  XCircle,
-  Clock,
   Truck,
-  FileText,
   Plus,
   Edit,
   Trash2,
   Save,
   X,
-  Users,
-  Settings,
-  AlertTriangle
+  Settings
 } from 'lucide-react';
 
 export const Traceability: React.FC = () => {
@@ -336,10 +331,10 @@ export const Traceability: React.FC = () => {
   ];
 
   // Stats
-  const totalBatches = batches.length;
-  const completedBatches = batches.filter(b => b.status === 'completed' || b.status === 'shipped').length;
-  const inProductionBatches = batches.filter(b => b.status === 'in_production').length;
-  const qcFailedBatches = batches.filter(b => b.status === 'qc_failed').length;
+  // const totalBatches = batches.length;
+  // const completedBatches = batches.filter(b => b.status === 'completed' || b.status === 'shipped').length;
+  // const inProductionBatches = batches.filter(b => b.status === 'in_production').length;
+  // const qcFailedBatches = batches.filter(b => b.status === 'qc_failed').length;
 
   return (
     <div className="space-y-6">

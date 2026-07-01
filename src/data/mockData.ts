@@ -17,10 +17,8 @@ import type {
   QualityCheckRequest,
   MaterialDisposal,
   QualityStandard,
-  QualityCriterion,
   DefectType,
   QualityCheckRecord,
-  QualityDefect,
   ProductDisposal,
   Warehouse,
   WarehouseItem,
@@ -30,8 +28,6 @@ import type {
   InventoryAdjustment,
   TraceabilityBatch,
   Factory,
-  ProductionLine,
-  Department,
   FactoryData,
   Translation,
   LanguageConfig,
@@ -49,9 +45,7 @@ import type {
   MaterialConsumptionReport,
   QualityReport,
   InventoryReport,
-  CostReport,
-  DashboardConfig,
-  DashboardWidget
+  CostReport
 } from '../types';
 
 export const initialMaterials: Material[] = [

@@ -9,16 +9,12 @@ import {
 } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import {
-  Recycle,
   Plus,
   Edit,
   Trash2,
   Save,
   X,
-  Package,
   AlertTriangle,
-  TrendingUp,
-  CheckCircle,
   Eye,
   Wrench
 } from 'lucide-react';
@@ -274,12 +270,12 @@ export const ScrapManagement: React.FC = () => {
           rejected: 'bg-red-100 text-red-800',
           processed: 'bg-blue-100 text-blue-800'
         };
-        const labels = {
-          pending: 'Chờ duyệt',
-          approved: 'Đã duyệt',
-          rejected: 'Từ chối',
-          processed: 'Đã xử lý'
-        };
+        // const labels = {
+        //   pending: 'Chờ duyệt',
+        //   approved: 'Đã duyệt',
+        //   rejected: 'Từ chối',
+        //   processed: 'Đã xử lý'
+        // };
         return (
           <select
             value={item.status}
@@ -344,13 +340,13 @@ export const ScrapManagement: React.FC = () => {
           completed: 'bg-purple-100 text-purple-800',
           cancelled: 'bg-red-100 text-red-800'
         };
-        const labels = {
-          pending: 'Chờ duyệt',
-          approved: 'Đã duyệt',
-          in_progress: 'Đang thực hiện',
-          completed: 'Hoàn thành',
-          cancelled: 'Đã hủy'
-        };
+        // const labels = {
+        //   pending: 'Chờ duyệt',
+        //   approved: 'Đã duyệt',
+        //   in_progress: 'Đang thực hiện',
+        //   completed: 'Hoàn thành',
+        //   cancelled: 'Đã hủy'
+        // };
         return (
           <select
             value={item.status}
@@ -404,11 +400,11 @@ export const ScrapManagement: React.FC = () => {
           in_transit: 'bg-blue-100 text-blue-800',
           completed: 'bg-green-100 text-green-800'
         };
-        const labels = {
-          pending: 'Chờ vận chuyển',
-          in_transit: 'Đang vận chuyển',
-          completed: 'Đã hoàn thành'
-        };
+        // const labels = {
+        //   pending: 'Chờ vận chuyển',
+        //   in_transit: 'Đang vận chuyển',
+        //   completed: 'Đã hoàn thành'
+        // };
         return (
           <select
             value={item.status}
@@ -439,10 +435,10 @@ export const ScrapManagement: React.FC = () => {
   ];
 
   // Stats
-  const totalScrap = scrapMaterials.length;
-  const pendingScrap = scrapMaterials.filter(s => s.status === 'pending').length;
-  const approvedScrap = scrapMaterials.filter(s => s.status === 'approved').length;
-  const totalDismantle = dismantleOrders.length;
+  // const totalScrap = scrapMaterials.length;
+  // const pendingScrap = scrapMaterials.filter(s => s.status === 'pending').length;
+  // const approvedScrap = scrapMaterials.filter(s => s.status === 'approved').length;
+  // const totalDismantle = dismantleOrders.length;
 
   return (
     <div className="space-y-6">

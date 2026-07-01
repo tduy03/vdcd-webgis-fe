@@ -9,7 +9,6 @@ import {
 } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import {
-  DollarSign,
   Plus,
   Edit,
   Trash2,
@@ -18,9 +17,7 @@ import {
   Package,
   Tag,
   FileText,
-  Calculator,
-  Box,
-  Printer
+  Calculator
 } from 'lucide-react';
 
 export const CostManagement: React.FC = () => {

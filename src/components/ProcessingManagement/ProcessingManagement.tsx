@@ -8,7 +8,6 @@ import {
 } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import {
-  Wrench,
   Plus,
   Edit,
   Trash2,
@@ -16,10 +15,7 @@ import {
   X,
   Building,
   Package,
-  Calendar,
-  DollarSign,
-  Users,
-  CheckCircle
+  Users
 } from 'lucide-react';
 
 export const ProcessingManagement: React.FC = () => {
@@ -270,12 +266,12 @@ export const ProcessingManagement: React.FC = () => {
           completed: 'bg-green-100 text-green-800',
           cancelled: 'bg-red-100 text-red-800'
         };
-        const labels = {
-          pending: 'Chờ xử lý',
-          in_progress: 'Đang gia công',
-          completed: 'Hoàn thành',
-          cancelled: 'Đã hủy'
-        };
+        // const labels = {
+        //   pending: 'Chờ xử lý',
+        //   in_progress: 'Đang gia công',
+        //   completed: 'Hoàn thành',
+        //   cancelled: 'Đã hủy'
+        // };
         return (
           <select
             value={item.status}
@@ -329,11 +325,11 @@ export const ProcessingManagement: React.FC = () => {
           in_progress: 'bg-blue-100 text-blue-800',
           completed: 'bg-green-100 text-green-800'
         };
-        const labels = {
-          pending: 'Chờ thực hiện',
-          in_progress: 'Đang thực hiện',
-          completed: 'Hoàn thành'
-        };
+        // const labels = {
+        //   pending: 'Chờ thực hiện',
+        //   in_progress: 'Đang thực hiện',
+        //   completed: 'Hoàn thành'
+        // };
         return (
           <select
             value={item.status}
@@ -364,10 +360,10 @@ export const ProcessingManagement: React.FC = () => {
   ];
 
   // Stats
-  const totalSubcontractors = subcontractors.length;
-  const activeSubcontractors = subcontractors.filter(s => s.status === 'active').length;
-  const totalOutsourcing = outsourcingOrders.length;
-  const totalInternal = internalProcessings.length;
+  // const totalSubcontractors = subcontractors.length;
+  // const activeSubcontractors = subcontractors.filter(s => s.status === 'active').length;
+  // const totalOutsourcing = outsourcingOrders.length;
+  // const totalInternal = internalProcessings.length;
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import {
   initialProductionReports,
@@ -7,9 +7,7 @@ import {
   initialInventoryReports,
   initialCostReports,
   initialOEEIndicators,
-  initialProducts,
-  initialMaterials,
-  initialMachines
+  initialMaterials
 } from '../../data/mockData';
 import {
   BarChart,
@@ -29,26 +27,18 @@ import {
   Area,
   RadialBarChart,
   RadialBar,
-  ComposedChart,
-  Scatter
+  ComposedChart
 } from 'recharts';
 import {
   TrendingUp,
-  TrendingDown,
   Activity,
   Package,
   AlertTriangle,
   CheckCircle,
-  Clock,
   DollarSign,
   BarChart3,
-  PieChart as PieChartIcon,
-  LineChart as LineChartIcon,
-  Calendar,
   Download,
-  RefreshCw,
-  Filter,
-  Eye
+  RefreshCw
 } from 'lucide-react';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -60,9 +50,9 @@ export const ReportDashboard: React.FC = () => {
   const [inventoryReports] = useLocalStorage('inventoryReports', initialInventoryReports);
   const [costReports] = useLocalStorage('costReports', initialCostReports);
   const [oeeIndicators] = useLocalStorage('oeeIndicators', initialOEEIndicators);
-  const [products] = useLocalStorage('products', initialProducts);
+  // const [products] = useLocalStorage('products', initialProducts);
   const [materials] = useLocalStorage('materials', initialMaterials);
-  const [machines] = useLocalStorage('machines', initialMachines);
+  // const [machines] = useLocalStorage('machines', initialMachines);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'production' | 'material' | 'quality' | 'inventory' | 'cost' | 'oee'>('overview');
   const [selectedPeriod, setSelectedPeriod] = useState<'7days' | '30days' | '90days'>('30days');
@@ -469,9 +459,7 @@ export const ReportDashboard: React.FC = () => {
                       endAngle={-270}
                     >
                       <RadialBar
-                        minAngle={15}
                         background
-                        clockWise
                         dataKey="value"
                         fill="#00C49F"
                         label={{ position: 'center', formatter: () => `${Math.round(avgCompletion)}%` }}
@@ -630,7 +618,7 @@ export const ReportDashboard: React.FC = () => {
                         fill="#8884d8"
                         dataKey="count"
                       >
-                        {defectChartData.map((entry: any, index: number) => (
+                        {defectChartData.map((_entry: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>

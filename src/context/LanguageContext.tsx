@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { initialLanguageConfig, initialTranslations } from '../data/mockData';
 import type { Language, Translation } from '../types';
@@ -21,7 +21,7 @@ export const useLanguage = () => {
 };
 
 interface LanguageProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {

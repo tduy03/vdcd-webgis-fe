@@ -3,7 +3,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { initialMaterials, initialProducts } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import { Plus, Edit, Trash2, Package, Box, X, Save } from 'lucide-react';
-import type { Material, Product, MaterialRequirement } from '../../types';
+import type { MaterialRequirement } from '../../types';
 
 export const ProductionCatalog: React.FC = () => {
   const [materials, setMaterials] = useLocalStorage('materials', initialMaterials);

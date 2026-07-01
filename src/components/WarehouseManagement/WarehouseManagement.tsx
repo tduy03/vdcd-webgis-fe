@@ -20,12 +20,9 @@ import {
   Trash2,
   Save,
   X,
-  Eye,
-  Truck,
   ClipboardList,
   CheckCircle,
-  AlertCircle,
-  BarChart
+  AlertCircle
 } from 'lucide-react';
 
 export const WarehouseManagement: React.FC = () => {

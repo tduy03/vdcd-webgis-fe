@@ -3,7 +3,6 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { initialFactories, initialFactoryData } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import {
-  Factory,
   Plus,
   Edit,
   Trash2,
@@ -13,8 +12,7 @@ import {
   Building,
   Users,
   Settings,
-  BarChart,
-  TrendingUp
+  BarChart
 } from 'lucide-react';
 
 export const FactoryManagement: React.FC = () => {

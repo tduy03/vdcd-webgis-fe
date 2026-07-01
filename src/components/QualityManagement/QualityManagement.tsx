@@ -10,20 +10,13 @@ import {
 } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import {
-  Shield,
-  CheckCircle,
-  XCircle,
   AlertTriangle,
   Plus,
   Edit,
   Trash2,
   Save,
   X,
-  Eye,
-  FileText,
   ClipboardCheck,
-  ThumbsUp,
-  ThumbsDown,
   List,
   Award
 } from 'lucide-react';
@@ -241,15 +234,15 @@ export const QualityManagement: React.FC = () => {
         return product ? product.name : 'Không xác định';
       }
     },
-    {
-      key: 'samplingMethod',
-      header: 'Phương pháp',
-      render: (item: any) => ({
-        random: 'Ngẫu nhiên',
-        systematic: 'Hệ thống',
-        stratified: 'Phân tầng'
-      }[item.samplingMethod] || item.samplingMethod)
-    },
+    // {
+    //   key: 'samplingMethod',
+    //   header: 'Phương pháp',
+    //   render: (item: any) => ({
+    //     random: 'Ngẫu nhiên',
+    //     systematic: 'Hệ thống',
+    //     stratified: 'Phân tầng'
+    //   }[item.samplingMethod] || item.samplingMethod)
+    // },
     { key: 'sampleSize', header: 'Cỡ mẫu' },
     {
       key: 'status',
@@ -303,7 +296,7 @@ export const QualityManagement: React.FC = () => {
       header: 'Mức độ',
       render: (item: any) => (
         <span className="font-medium">
-          {Array.from({ length: item.severity }, (_, i) => '⭐').join('')}
+          {Array.from({ length: item.severity }, () => '⭐').join('')}
         </span>
       )
     },

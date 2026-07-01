@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { initialMaterials, initialProducts, initialProductionPlans, initialMachines } from '../../data/mockData';
-import { Package, TrendingUp, AlertTriangle, Factory, DollarSign, Clock, CheckCircle  } from 'lucide-react';
+import { Package, TrendingUp, AlertTriangle, Factory, DollarSign, CheckCircle  } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const [materials] = useLocalStorage('materials', initialMaterials);

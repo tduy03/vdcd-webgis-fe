@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { initialProductionPlans, initialProducts, initialMaterials } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
-import { Calendar, CheckCircle, Clock, XCircle, FileEdit, TrendingUp, Plus, Trash2, Save, X } from 'lucide-react';
-import type { ProductionPlan, MaterialAllocation } from '../../types';
+import { CheckCircle, XCircle, FileEdit, TrendingUp, Plus, Trash2, Save, X } from 'lucide-react';
+import type { MaterialAllocation, ProductionPlan as ProductionPlanType } from '../../types';
 
 export const ProductionPlan: React.FC = () => {
   const [plans, setPlans] = useLocalStorage('productionPlans', initialProductionPlans);
@@ -12,7 +12,7 @@ export const ProductionPlan: React.FC = () => {
   
   // State cho form
   const [showForm, setShowForm] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<ProductionPlan | null>(null);
+  const [editingPlan, setEditingPlan] = useState<ProductionPlanType | null>(null);
   const [formData, setFormData] = useState<any>({
     code: '',
     productId: '',
@@ -37,16 +37,16 @@ export const ProductionPlan: React.FC = () => {
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const getStatusLabel = (status: string) => {
-    const labels = {
-      draft: 'Nháp',
-      approved: 'Đã duyệt',
-      in_progress: 'Đang thực hiện',
-      completed: 'Hoàn thành',
-      cancelled: 'Đã hủy'
-    };
-    return labels[status as keyof typeof labels] || status;
-  };
+  // const getStatusLabel = (status: string) => {
+  //   const labels = {
+  //     draft: 'Nháp',
+  //     approved: 'Đã duyệt',
+  //     in_progress: 'Đang thực hiện',
+  //     completed: 'Hoàn thành',
+  //     cancelled: 'Đã hủy'
+  //   };
+  //   return labels[status as keyof typeof labels] || status;
+  // };
 
   // Mở form thêm mới
   const handleAdd = () => {
@@ -69,7 +69,7 @@ export const ProductionPlan: React.FC = () => {
   };
 
   // Mở form sửa
-  const handleEdit = (plan: ProductionPlan) => {
+  const handleEdit = (plan: ProductionPlanType) => {
     setEditingPlan(plan);
     setFormData({
       ...plan,

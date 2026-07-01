@@ -5,25 +5,18 @@ import {
   initialWorkAssignments,
   initialEmployees,
   initialWorkShiftsReal,
-  initialQualityControls,
   initialProducts,
   initialMaterials,
   initialMachines,
   initialMaterialRequests,
   initialTransfers,
-  initialOEEIndicators,
-  initialQualityCheckRequests,
-  initialMaterialDisposals,
-  initialProductionStatistics
+  initialOEEIndicators
 } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
 import { 
-  Play, 
   CheckCircle, 
-  Clock, 
   XCircle, 
   FileText, 
-  Users, 
   Calendar,
   Plus,
   Edit,
@@ -32,18 +25,11 @@ import {
   X,
   Eye,
   FileCheck,
-  AlertTriangle,
   UserCheck,
   ClipboardList,
   Package,
-  TrendingUp,
-  ArrowRight,
-  CheckSquare,
   BarChart,
-  RefreshCw,
-  Truck,
-  FileBarChart,
-  FlaskConical
+  Truck
 } from 'lucide-react';
 
 export const ProductionExecution: React.FC = () => {
@@ -52,7 +38,7 @@ export const ProductionExecution: React.FC = () => {
   const [assignments, setAssignments] = useLocalStorage('workAssignments', initialWorkAssignments);
   const [employees] = useLocalStorage('employees', initialEmployees);
   const [shifts] = useLocalStorage('workShifts', initialWorkShiftsReal);
-  const [qualityControls] = useLocalStorage('qualityControls', initialQualityControls);
+  // const [qualityControls] = useLocalStorage('qualityControls', initialQualityControls);
   const [products] = useLocalStorage('products', initialProducts);
   const [materials] = useLocalStorage('materials', initialMaterials);
   const [machines] = useLocalStorage('machines', initialMachines);
@@ -61,9 +47,9 @@ export const ProductionExecution: React.FC = () => {
   const [materialRequests, setMaterialRequests] = useLocalStorage('materialRequests', initialMaterialRequests);
   const [transfers, setTransfers] = useLocalStorage('transfers', initialTransfers);
   const [oeeIndicators, setOeeIndicators] = useLocalStorage('oeeIndicators', initialOEEIndicators);
-  const [qualityChecks, setQualityChecks] = useLocalStorage('qualityChecks', initialQualityCheckRequests);
-  const [disposals, setDisposals] = useLocalStorage('disposals', initialMaterialDisposals);
-  const [statistics] = useLocalStorage('statistics', initialProductionStatistics);
+  // const [qualityChecks, setQualityChecks] = useLocalStorage('qualityChecks', initialQualityCheckRequests);
+  // const [disposals, setDisposals] = useLocalStorage('disposals', initialMaterialDisposals);
+  // const [statistics] = useLocalStorage('statistics', initialProductionStatistics);
   
   // ===== STATE =====
   const [activeTab, setActiveTab] = useState<'orders' | 'assignments' | 'monitoring' | 'materials' | 'oee'>('orders');
@@ -464,12 +450,12 @@ export const ProductionExecution: React.FC = () => {
           completed: 'bg-green-100 text-green-800',
           rejected: 'bg-red-100 text-red-800'
         };
-        const labels = {
-          pending: 'Chờ thực hiện',
-          in_progress: 'Đang thực hiện',
-          completed: 'Hoàn thành',
-          rejected: 'Từ chối'
-        };
+        // const labels = {
+        //   pending: 'Chờ thực hiện',
+        //   in_progress: 'Đang thực hiện',
+        //   completed: 'Hoàn thành',
+        //   rejected: 'Từ chối'
+        // };
         return (
           <select
             value={item.status}
@@ -619,12 +605,12 @@ export const ProductionExecution: React.FC = () => {
           rejected: 'bg-red-100 text-red-800',
           issued: 'bg-blue-100 text-blue-800'
         };
-        const labels = {
-          pending: 'Chờ duyệt',
-          approved: 'Đã duyệt',
-          rejected: 'Từ chối',
-          issued: 'Đã xuất'
-        };
+        // const labels = {
+        //   pending: 'Chờ duyệt',
+        //   approved: 'Đã duyệt',
+        //   rejected: 'Từ chối',
+        //   issued: 'Đã xuất'
+        // };
         return (
           <select
             value={item.status}
@@ -696,11 +682,11 @@ export const ProductionExecution: React.FC = () => {
           completed: 'bg-green-100 text-green-800',
           cancelled: 'bg-red-100 text-red-800'
         };
-        const labels = {
-          pending: 'Chờ bàn giao',
-          completed: 'Đã bàn giao',
-          cancelled: 'Đã hủy'
-        };
+        // const labels = {
+        //   pending: 'Chờ bàn giao',
+        //   completed: 'Đã bàn giao',
+        //   cancelled: 'Đã hủy'
+        // };
         return (
           <select
             value={item.status}
@@ -741,15 +727,15 @@ export const ProductionExecution: React.FC = () => {
       }
     },
     { key: 'date', header: 'Ngày', render: (item: any) => new Date(item.date).toLocaleDateString('vi-VN') },
-    {
-      key: 'shift',
-      header: 'Ca',
-      render: (item: any) => ({
-        morning: 'Ca sáng',
-        afternoon: 'Ca chiều',
-        night: 'Ca đêm'
-      }[item.shift] || item.shift)
-    },
+    // {
+    //   key: 'shift',
+    //   header: 'Ca',
+    //   render: (item: any) => ({
+    //     morning: 'Ca sáng',
+    //     afternoon: 'Ca chiều',
+    //     night: 'Ca đêm'
+    //   }[item.shift] || item.shift)
+    // },
     {
       key: 'oee',
       header: 'OEE',
@@ -779,10 +765,10 @@ export const ProductionExecution: React.FC = () => {
   ];
 
   // ===== STATS =====
-  const totalOrders = orders.length;
-  const inProgressOrders = orders.filter(o => o.status === 'in_progress').length;
-  const completedOrders = orders.filter(o => o.status === 'completed').length;
-  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  // const totalOrders = orders.length;
+  // const inProgressOrders = orders.filter(o => o.status === 'in_progress').length;
+  // const completedOrders = orders.filter(o => o.status === 'completed').length;
+  // const pendingOrders = orders.filter(o => o.status === 'pending').length;
 
   const avgOEE = oeeIndicators.length > 0 
     ? Math.round(oeeIndicators.reduce((sum, o) => sum + o.oee, 0) / oeeIndicators.length) 
@@ -815,10 +801,10 @@ export const ProductionExecution: React.FC = () => {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
         >
           <Plus className="w-4 h-4" />
-          {activeTab === 'orders' ? 'Tạo lệnh SX' : 
-           activeTab === 'materials' ? 'Yêu cầu vật tư' :
-           activeTab === 'oee' ? 'Thêm OEE' :
-           activeTab === 'transfers' ? 'Tạo bàn giao' : 'Thêm mới'}
+            {activeTab === 'orders' ? 'Tạo lệnh SX' : 
+            activeTab === 'materials' ? 'Yêu cầu vật tư' :
+            activeTab === 'oee' ? 'Thêm OEE' :
+            'Thêm mới'}
         </button>
       </div>
 

@@ -1,12 +1,8 @@
 import React from 'react';
 import { 
-  LayoutDashboard, 
   Package, 
   ClipboardList, 
-  Settings,
   Factory,
-  Users,
-  Truck,
   PlayCircle,
   Shield,
   Warehouse,
