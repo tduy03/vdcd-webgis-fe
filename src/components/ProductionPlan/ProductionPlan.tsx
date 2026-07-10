@@ -2,13 +2,32 @@ import React, { useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { initialProductionPlans, initialProducts, initialMaterials } from '../../data/mockData';
 import { DataTable } from '../Common/DataTable';
-import { CheckCircle, XCircle, FileEdit, TrendingUp, Plus, Trash2, Save, X } from 'lucide-react';
+import { 
+  CheckCircle, 
+  XCircle, 
+  FileEdit, 
+  TrendingUp, 
+  Plus, 
+  Trash2, 
+  Save, 
+  X,
+  Play,
+  Package,
+  DollarSign,
+  Link,
+  Eye,
+  Info,
+  AlertCircle
+} from 'lucide-react';
 import type { MaterialAllocation, ProductionPlan as ProductionPlanType } from '../../types';
 
 export const ProductionPlan: React.FC = () => {
   const [plans, setPlans] = useLocalStorage('productionPlans', initialProductionPlans);
   const [products] = useLocalStorage('products', initialProducts);
   const [materials] = useLocalStorage('materials', initialMaterials);
+  
+  // State cho popup
+  const [popup, setPopup] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; message: string; title?: string } | null>(null);
   
   // State cho form
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +45,11 @@ export const ProductionPlan: React.FC = () => {
     materialsAllocated: [] as MaterialAllocation[],
   });
 
+  // Hàm hiển thị popup
+  const showPopup = (type: 'success' | 'error' | 'warning' | 'info', message: string, title?: string) => {
+    setPopup({ type, message, title });
+  };
+
   const getStatusColor = (status: string) => {
     const colors = {
       draft: 'bg-gray-100 text-gray-800',
@@ -37,16 +61,16 @@ export const ProductionPlan: React.FC = () => {
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  // const getStatusLabel = (status: string) => {
-  //   const labels = {
-  //     draft: 'Nháp',
-  //     approved: 'Đã duyệt',
-  //     in_progress: 'Đang thực hiện',
-  //     completed: 'Hoàn thành',
-  //     cancelled: 'Đã hủy'
-  //   };
-  //   return labels[status as keyof typeof labels] || status;
-  // };
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      draft: 'Nháp',
+      approved: 'Đã duyệt',
+      in_progress: 'Đang thực hiện',
+      completed: 'Hoàn thành',
+      cancelled: 'Đã hủy'
+    };
+    return labels[status as keyof typeof labels] || status;
+  };
 
   // Mở form thêm mới
   const handleAdd = () => {
@@ -83,6 +107,7 @@ export const ProductionPlan: React.FC = () => {
   const handleDelete = (id: string) => {
     if (window.confirm('Bạn có chắc muốn xóa kế hoạch này?')) {
       setPlans(plans.filter(p => p.id !== id));
+      showPopup('success', 'Đã xóa kế hoạch thành công!', '🗑️ Xóa thành công');
     }
   };
 
@@ -91,37 +116,235 @@ export const ProductionPlan: React.FC = () => {
     setPlans(plans.map(p => 
       p.id === id ? { ...p, status: newStatus as any } : p
     ));
+    const labels: Record<string, string> = {
+      draft: 'Nháp',
+      approved: 'Đã duyệt',
+      in_progress: 'Đang thực hiện',
+      completed: 'Hoàn thành',
+      cancelled: 'Đã hủy'
+    };
+    showPopup('success', `Đã chuyển trạng thái sang "${labels[newStatus]}"`, '🔄 Cập nhật trạng thái');
+  };
+
+  // ===== LIÊN KẾT VỚI MODULE 3: TẠO LỆNH SẢN XUẤT =====
+  const createProductionOrder = (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) {
+      showPopup('error', 'Không tìm thấy kế hoạch!', '❌ Lỗi');
+      return;
+    }
+    
+    const existingOrders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
+    const existingOrder = existingOrders.find((o: any) => o.planId === plan.id);
+    
+    if (existingOrder) {
+      showPopup('warning', `Kế hoạch ${plan.code} đã có lệnh sản xuất ${existingOrder.code}`, '⚠️ Đã tồn tại');
+      return;
+    }
+    
+    const newOrder = {
+      id: Date.now().toString(),
+      code: `LSX${String(existingOrders.length + 1).padStart(3, '0')}`,
+      planId: plan.id,
+      productId: plan.productId,
+      quantity: plan.quantity,
+      unit: 'tấn',
+      priority: 'medium',
+      status: 'pending',
+      source: 'plan',
+      orderDate: new Date().toISOString(),
+      startDate: plan.startDate,
+      endDate: plan.endDate,
+      assignedTeam: plan.team,
+      assignedLine: plan.line,
+      supervisor: '',
+      notes: `Tạo từ kế hoạch ${plan.code}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem('productionOrders', JSON.stringify([...existingOrders, newOrder]));
+    showPopup('success', `Đã tạo lệnh sản xuất ${newOrder.code} từ kế hoạch ${plan.code}`, '✅ Tạo thành công');
+  };
+
+  // ===== LIÊN KẾT VỚI MODULE 5: XUẤT KHO NVL =====
+  const createMaterialRequest = (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) {
+      showPopup('error', 'Không tìm thấy kế hoạch!', '❌ Lỗi');
+      return;
+    }
+    
+    const existingRequests = JSON.parse(localStorage.getItem('materialRequests') || '[]');
+    let createdCount = 0;
+    
+    plan.materialsAllocated.forEach(item => {
+      const existing = existingRequests.find((r: any) => r.orderId === plan.id && r.materialId === item.materialId);
+      if (existing) {
+        const updated = existingRequests.map((r: any) => {
+          if (r.orderId === plan.id && r.materialId === item.materialId) {
+            return { ...r, quantity: item.required, updatedAt: new Date().toISOString() };
+          }
+          return r;
+        });
+        localStorage.setItem('materialRequests', JSON.stringify(updated));
+      } else {
+        const request = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+          code: `VT${String(existingRequests.length + 1).padStart(3, '0')}`,
+          orderId: plan.id,
+          materialId: item.materialId,
+          quantity: item.required,
+          unit: item.unit,
+          purpose: `Sản xuất theo kế hoạch ${plan.code}`,
+          status: 'pending',
+          requestedBy: 'Hệ thống',
+          requestDate: new Date().toISOString(),
+          notes: `Tự động tạo từ kế hoạch ${plan.code}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        existingRequests.push(request);
+        createdCount++;
+      }
+    });
+    
+    localStorage.setItem('materialRequests', JSON.stringify(existingRequests));
+    showPopup('success', `Đã tạo/cập nhật ${createdCount} yêu cầu xuất kho cho kế hoạch ${plan.code}`, '📦 Tạo yêu cầu thành công');
+  };
+
+  // ===== LIÊN KẾT VỚI MODULE 10: TẠO DỰ TOÁN CHI PHÍ =====
+  const createCostEstimate = (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) {
+      showPopup('error', 'Không tìm thấy kế hoạch!', '❌ Lỗi');
+      return;
+    }
+    
+    const existingEstimates = JSON.parse(localStorage.getItem('costEstimates') || '[]');
+    const existing = existingEstimates.find((e: any) => e.planId === plan.id);
+    
+    if (existing) {
+      showPopup('warning', `Kế hoạch ${plan.code} đã có dự toán chi phí ${existing.code}`, '⚠️ Đã tồn tại');
+      return;
+    }
+    
+    const materialCost = plan.materialsAllocated.reduce((sum, item) => {
+      const material = materials.find(m => m.id === item.materialId);
+      return sum + (material ? item.required * material.price : 0);
+    }, 0);
+    
+    const estimate = {
+      id: Date.now().toString(),
+      code: `DT${String(existingEstimates.length + 1).padStart(3, '0')}`,
+      planId: plan.id,
+      productId: plan.productId,
+      quantity: plan.quantity,
+      unit: 'tấn',
+      estimatedMaterialCost: Math.round(materialCost),
+      estimatedLaborCost: Math.round(materialCost * 0.3),
+      estimatedOverheadCost: Math.round(materialCost * 0.15),
+      totalEstimatedCost: Math.round(materialCost * 1.45),
+      status: 'draft',
+      notes: `Dự toán từ kế hoạch ${plan.code}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem('costEstimates', JSON.stringify([...existingEstimates, estimate]));
+    showPopup('success', `Đã tạo dự toán chi phí: ${estimate.totalEstimatedCost.toLocaleString()} VND`, '💰 Tạo dự toán thành công');
+  };
+
+  // ===== XEM CHI TIẾT LIÊN KẾT =====
+  const viewLinkedData = (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    
+    const orders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
+    const order = orders.find((o: any) => o.planId === plan.id);
+    
+    const estimates = JSON.parse(localStorage.getItem('costEstimates') || '[]');
+    const estimate = estimates.find((e: any) => e.planId === plan.id);
+    
+    const requests = JSON.parse(localStorage.getItem('materialRequests') || '[]');
+    const planRequests = requests.filter((r: any) => r.orderId === plan.id);
+    
+    let message = `📋 THÔNG TIN LIÊN KẾT - ${plan.code}\n`;
+    message += `═══════════════════════════════\n\n`;
+    message += `📌 Kế hoạch: ${plan.code}\n`;
+    message += `📦 Sản phẩm: ${products.find(p => p.id === plan.productId)?.name || 'Không xác định'}\n`;
+    message += `📊 Số lượng: ${plan.quantity} tấn\n`;
+    message += `📅 Ngày: ${new Date(plan.startDate).toLocaleDateString('vi-VN')} → ${new Date(plan.endDate).toLocaleDateString('vi-VN')}\n\n`;
+    
+    message += `🔗 LỆNH SẢN XUẤT:\n`;
+    if (order) {
+      message += `   ✅ ${order.code} - Trạng thái: ${order.status}\n`;
+    } else {
+      message += `   ❌ Chưa có lệnh sản xuất\n`;
+    }
+    
+    message += `\n💰 DỰ TOÁN CHI PHÍ:\n`;
+    if (estimate) {
+      message += `   ✅ ${estimate.code} - Tổng: ${estimate.totalEstimatedCost.toLocaleString()} VND\n`;
+    } else {
+      message += `   ❌ Chưa có dự toán\n`;
+    }
+    
+    message += `\n📦 YÊU CẦU VẬT TƯ:\n`;
+    if (planRequests.length > 0) {
+      planRequests.forEach((r: any) => {
+        const material = materials.find(m => m.id === r.materialId);
+        message += `   ${r.status === 'approved' ? '✅' : '⏳'} ${material?.name || 'Không xác định'}: ${r.quantity} ${r.unit} - ${r.status === 'approved' ? 'Đã duyệt' : 'Chờ duyệt'}\n`;
+      });
+    } else {
+      message += `   ❌ Chưa có yêu cầu vật tư\n`;
+    }
+    
+    showPopup('info', message, '📊 Thông tin liên kết');
   };
 
   // Lưu kế hoạch
+  // Lưu kế hoạch (SỬA LẠI)
   const savePlan = () => {
     if (!formData.productId || !formData.quantity || formData.quantity <= 0) {
-      alert('Vui lòng chọn sản phẩm và nhập số lượng hợp lệ!');
+      showPopup('error', 'Vui lòng chọn sản phẩm và nhập số lượng hợp lệ!', '❌ Lỗi nhập liệu');
       return;
     }
 
-    // Tự động phân bổ nguyên vật liệu từ BOM của sản phẩm
     const product = products.find(p => p.id === formData.productId);
     if (product) {
-      const materialsAllocated = product.bom.map(bom => {
+      // Tính toán lại required từ BOM
+      const newMaterialsAllocated = product.bom.map(bom => {
         const material = materials.find(m => m.id === bom.materialId);
-        const required = (formData.quantity / 1) * bom.quantity; // Giả định 1 tấn sản phẩm cần bom.quantity NVL
+        const required = (formData.quantity / 1) * bom.quantity;
         return {
           materialId: bom.materialId,
           required: Math.round(required * 100) / 100,
-          allocated: 0,
+          allocated: 0, // Giá trị mặc định
           unit: material?.unit || '',
         };
       });
-      formData.materialsAllocated = materialsAllocated;
+
+      // Nếu đang chỉnh sửa, giữ lại giá trị allocated đã nhập từ form
+      if (editingPlan && formData.materialsAllocated.length > 0) {
+        const existingAllocations = formData.materialsAllocated;
+        newMaterialsAllocated.forEach((item: any) => {
+          const existing = existingAllocations.find((e: any) => e.materialId === item.materialId);
+          if (existing) {
+            item.allocated = existing.allocated;
+          }
+        });
+      }
+      
+      formData.materialsAllocated = newMaterialsAllocated;
     }
 
     if (editingPlan) {
-      // Cập nhật
       setPlans(plans.map(p => p.id === editingPlan.id ? { ...formData, id: editingPlan.id } : p));
+      showPopup('success', `Đã cập nhật kế hoạch ${formData.code}`, '✏️ Cập nhật thành công');
     } else {
-      // Thêm mới
       setPlans([...plans, { ...formData, id: Date.now().toString(), createdAt: new Date().toISOString() }]);
+      showPopup('success', `Đã tạo kế hoạch ${formData.code}`, '📝 Tạo thành công');
     }
     setShowForm(false);
     setEditingPlan(null);
@@ -178,19 +401,53 @@ export const ProductionPlan: React.FC = () => {
       key: 'actions',
       header: 'Thao tác',
       render: (item: any) => (
-        <div className="flex gap-2">
+        <div className="flex gap-1 flex-wrap">
           <button 
             onClick={() => handleEdit(item)}
             className="text-blue-600 hover:text-blue-800 p-1 hover:bg-blue-50 rounded transition-colors"
+            title="Chỉnh sửa"
           >
             <FileEdit className="w-4 h-4" />
           </button>
           <button 
             onClick={() => handleDelete(item.id)}
             className="text-red-600 hover:text-red-800 p-1 hover:bg-red-50 rounded transition-colors"
+            title="Xóa"
           >
             <Trash2 className="w-4 h-4" />
           </button>
+          <button 
+            onClick={() => viewLinkedData(item.id)}
+            className="text-gray-600 hover:text-gray-800 p-1 hover:bg-gray-50 rounded transition-colors"
+            title="Xem liên kết"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          {item.status === 'approved' && (
+            <>
+              <button 
+                onClick={() => createProductionOrder(item.id)}
+                className="text-green-600 hover:text-green-800 p-1 hover:bg-green-50 rounded transition-colors"
+                title="Tạo lệnh sản xuất"
+              >
+                <Play className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => createMaterialRequest(item.id)}
+                className="text-purple-600 hover:text-purple-800 p-1 hover:bg-purple-50 rounded transition-colors"
+                title="Yêu cầu xuất kho"
+              >
+                <Package className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => createCostEstimate(item.id)}
+                className="text-yellow-600 hover:text-yellow-800 p-1 hover:bg-yellow-50 rounded transition-colors"
+                title="Tạo dự toán chi phí"
+              >
+                <DollarSign className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       )
     }
@@ -202,11 +459,83 @@ export const ProductionPlan: React.FC = () => {
   const inProgressPlans = plans.filter(p => p.status === 'in_progress' || p.status === 'approved').length;
   const draftPlans = plans.filter(p => p.status === 'draft').length;
 
+  // Kiểm tra trạng thái liên kết
+  const getLinkedStatus = (plan: ProductionPlanType) => {
+    const orders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
+    const hasOrder = orders.some((o: any) => o.planId === plan.id);
+    
+    const estimates = JSON.parse(localStorage.getItem('costEstimates') || '[]');
+    const hasEstimate = estimates.some((e: any) => e.planId === plan.id);
+    
+    const requests = JSON.parse(localStorage.getItem('materialRequests') || '[]');
+    const planRequests = requests.filter((r: any) => r.orderId === plan.id);
+    const allApproved = planRequests.length > 0 && planRequests.every((r: any) => r.status === 'approved');
+    const hasRequest = planRequests.length > 0;
+    
+    return { hasOrder, hasEstimate, hasRequest, allApproved };
+  };
+
   return (
     <div className="space-y-6">
+      {/* ===== POPUP MODAL ===== */}
+      {popup && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            {/* Header Popup */}
+            <div className={`p-4 rounded-t-xl flex items-center justify-between ${
+              popup.type === 'success' ? 'bg-gradient-to-r from-green-600 to-green-700' :
+              popup.type === 'error' ? 'bg-gradient-to-r from-red-600 to-red-700' :
+              popup.type === 'warning' ? 'bg-gradient-to-r from-yellow-600 to-yellow-700' :
+              'bg-gradient-to-r from-blue-600 to-blue-700'
+            } text-white`}>
+              <div className="flex items-center gap-3">
+                {popup.type === 'success' && <CheckCircle className="w-6 h-6" />}
+                {popup.type === 'error' && <XCircle className="w-6 h-6" />}
+                {popup.type === 'warning' && <AlertCircle className="w-6 h-6" />}
+                {popup.type === 'info' && <Info className="w-6 h-6" />}
+                <h3 className="text-lg font-bold">{popup.title || 'Thông báo'}</h3>
+              </div>
+              <button 
+                onClick={() => setPopup(null)}
+                className="p-1 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body Popup */}
+            <div className="p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+                    {popup.message}
+                  </p>
+                </div>
+              </div>
+
+              {/* Nút đóng */}
+              <div className="flex justify-end mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setPopup(null)}
+                  className={`px-4 py-2 rounded-lg text-white transition-colors ${
+                    popup.type === 'success' ? 'bg-green-600 hover:bg-green-700' :
+                    popup.type === 'error' ? 'bg-red-600 hover:bg-red-700' :
+                    popup.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700' :
+                    'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== HEADER ===== */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Kế hoạch sản xuất</h2>
+          <h2 className="text-2xl font-bold text-gray-800">📋 Kế hoạch sản xuất</h2>
           <p className="text-gray-600">Lập và điều chỉnh kế hoạch sản xuất chi tiết</p>
         </div>
         <button 
@@ -268,6 +597,7 @@ export const ProductionPlan: React.FC = () => {
                   <button 
                     onClick={() => handleEdit(plan)}
                     className="text-blue-600 hover:text-blue-800 p-1 hover:bg-blue-50 rounded"
+                    title="Chỉnh sửa"
                   >
                     <FileEdit className="w-4 h-4" />
                   </button>
@@ -278,6 +608,35 @@ export const ProductionPlan: React.FC = () => {
           {plans.filter(p => p.status !== 'completed' && p.status !== 'cancelled').length === 0 && (
             <p className="text-gray-500 text-center py-4">Không có kế hoạch đang thực hiện</p>
           )}
+        </div>
+      </div>
+
+      {/* Trạng thái liên kết */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <Link className="w-5 h-5 text-green-600" />
+          Trạng thái liên kết với các module khác
+        </h3>
+        <div className="space-y-2">
+          {plans.map(plan => {
+            const { hasOrder, hasEstimate, hasRequest, allApproved } = getLinkedStatus(plan);
+            return (
+              <div key={plan.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+                <span className="text-sm font-medium">{plan.code}</span>
+                <div className="flex items-center gap-4">
+                  <span className={`text-xs flex items-center gap-1 ${hasOrder ? 'text-green-600' : 'text-gray-400'}`}>
+                    {hasOrder ? '✅' : '⬜'} Lệnh SX
+                  </span>
+                  <span className={`text-xs flex items-center gap-1 ${hasEstimate ? 'text-green-600' : 'text-gray-400'}`}>
+                    {hasEstimate ? '✅' : '⬜'} Dự toán
+                  </span>
+                  <span className={`text-xs flex items-center gap-1 ${hasRequest ? (allApproved ? 'text-green-600' : 'text-yellow-600') : 'text-gray-400'}`}>
+                    {hasRequest ? (allApproved ? '✅' : '⏳') : '⬜'} Vật tư
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -292,7 +651,7 @@ export const ProductionPlan: React.FC = () => {
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-800">
-                {editingPlan ? 'Chỉnh sửa' : 'Tạo mới'} Kế hoạch sản xuất
+                {editingPlan ? '✏️ Chỉnh sửa' : '📝 Tạo mới'} Kế hoạch sản xuất
               </h3>
               <button 
                 onClick={() => setShowForm(false)}
@@ -309,7 +668,6 @@ export const ProductionPlan: React.FC = () => {
                   <input
                     type="text"
                     value={formData.code}
-                    onChange={(e) => setFormData({...formData, code: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                     disabled
                   />
@@ -320,7 +678,6 @@ export const ProductionPlan: React.FC = () => {
                     value={formData.productId}
                     onChange={(e) => {
                       setFormData({...formData, productId: e.target.value});
-                      // Tự động thêm BOM khi chọn sản phẩm
                       const product = products.find(p => p.id === e.target.value);
                       if (product) {
                         const materialsAllocated = product.bom.map(bom => {
@@ -351,7 +708,6 @@ export const ProductionPlan: React.FC = () => {
                     onChange={(e) => {
                       const quantity = parseFloat(e.target.value);
                       setFormData({...formData, quantity});
-                      // Cập nhật required quantity cho BOM
                       const product = products.find(p => p.id === formData.productId);
                       if (product && quantity > 0) {
                         const newAllocations = formData.materialsAllocated.map((item: any, index: number) => {
@@ -441,7 +797,10 @@ export const ProductionPlan: React.FC = () => {
               {/* Material Allocation */}
               {formData.materialsAllocated.length > 0 && (
                 <div className="mt-6 border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-700 mb-3">Phân bổ nguyên vật liệu</h4>
+                  <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    <Package className="w-4 h-4 text-blue-600" />
+                    Phân bổ nguyên vật liệu
+                  </h4>
                   <div className="space-y-2">
                     {formData.materialsAllocated.map((item: any, index: number) => {
                       const material = materials.find(m => m.id === item.materialId);
